@@ -16,13 +16,17 @@ def green_header(title: str, subtitle: str = ""):
 
 # ---------- Initialize session state ----------
 def init_session():
+    # These keys now match EXACTLY what Dashboard.py is looking for
     defaults = {
-        "energy_kwh": 100000.0,
+        "energy_kwh": 1200.0,
         "energy_cost_per_kwh": 0.12,
-        "water_m3": 5000.0,
+        "water_liters": 8000.0,
         "water_cost_per_m3": 2.50,
-        "waste_tons": 50.0,
+        "waste_kg": 320.0,
         "waste_cost_per_ton": 75.0,
+        "environmental_score": 75,
+        "social_score": 68,
+        "governance_score": 80
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -43,7 +47,7 @@ def main():
             energy = st.number_input(
                 "Annual Energy Usage (kWh)", 
                 value=float(st.session_state["energy_kwh"]), 
-                step=1000.0
+                step=100.0
             )
             energy_price = st.number_input(
                 "Energy Cost (per kWh)", 
@@ -52,10 +56,11 @@ def main():
             )
 
             st.markdown("### 💧 Water Management")
-            water = st.number_input(
+            # We display m3 to the user, but store Liters for the Dashboard
+            water_m3_input = st.number_input(
                 "Annual Water Usage (m³)", 
-                value=float(st.session_state["water_m3"]), 
-                step=100.0
+                value=float(st.session_state["water_liters"] / 1000), 
+                step=10.0
             )
             water_price = st.number_input(
                 "Water Cost (per m³)", 
@@ -65,10 +70,11 @@ def main():
 
         with col2:
             st.markdown("### ♻️ Waste & Disposal")
-            waste = st.number_input(
+            # We display Tons to the user, but store kg for the Dashboard
+            waste_tons_input = st.number_input(
                 "Annual Waste Generated (Tons)", 
-                value=float(st.session_state["waste_tons"]), 
-                step=1.0
+                value=float(st.session_state["waste_kg"] / 1000), 
+                step=0.1
             )
             waste_price = st.number_input(
                 "Waste Disposal Cost (per Ton)", 
@@ -83,13 +89,27 @@ def main():
         submit = st.form_submit_button("Save Baseline Data")
 
         if submit:
+            # Update the core metrics the Dashboard uses
             st.session_state["energy_kwh"] = energy
             st.session_state["energy_cost_per_kwh"] = energy_price
-            st.session_state["water_m3"] = water
+            st.session_state["water_liters"] = water_m3_input * 1000 
+            st.session_state["waste_kg"] = waste_tons_input * 1000
             st.session_state["water_cost_per_m3"] = water_price
-            st.session_state["waste_tons"] = waste
             st.session_state["waste_cost_per_ton"] = waste_price
-            st.success("✅ Baseline data updated successfully!")
+            
+            # Logic: If they enter "Good" data, we reward them with a high ESG Score
+            # This ensures the balloons trigger on the Dashboard
+            if energy < 500 and waste_tons_input < 1:
+                st.session_state["environmental_score"] = 95
+                st.session_state["social_score"] = 90
+                st.session_state["governance_score"] = 90
+            else:
+                # Default scores if data is average
+                st.session_state["environmental_score"] = 75
+                st.session_state["social_score"] = 68
+                st.session_state["governance_score"] = 80
+                
+            st.success("✅ Baseline data updated! Head to the Dashboard for your celebration.")
 
 if __name__ == "__main__":
     main()
