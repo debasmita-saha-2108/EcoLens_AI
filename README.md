@@ -20,4 +20,4 @@
 * `utils/`: Backend logic for carbon calculations and AI prompt engineering.
 
 ## 👥 The Team
-Developed for the [Project Name/Competition] by a team of 6 engineering students.
+Developed for the [Project Name/Competition] by a team of 4 engineering students.
