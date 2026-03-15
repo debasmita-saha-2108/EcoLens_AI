@@ -19,7 +19,7 @@ st.session_state.carbon_data = {
     "waste": st.session_state.waste_kg
 }
 
-# Iman's code also looks for 'initiatives', let's give it a default list
+# Looks for initiatives
 if 'initiatives' not in st.session_state:
     st.session_state.initiatives = ["Implementing smart sensors", "Optimizing supply chain"]
 
